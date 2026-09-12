@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  email     String  @unique
+  password  String
+  address   String?
+  phone     String?
+  openingHours String?
+  socialMedia String? // JSON string or comma-separated
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relationship: one store has many products
+  products  Product[]
+}
+
+model Product {
+  id        Int     @id @default(autoincrement())
+  name      String
+  category  String
+  calories  Int?
+  price     Float
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Foreign key: product belongs to store
+  storeId   Int
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  @@unique([name, storeId]) // name must be unique per store
+}
