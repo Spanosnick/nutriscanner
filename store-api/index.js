@@ -104,6 +104,27 @@ app.get('/api/auth/me', requireAuth, async (req, res) => {
   }
 });
 
+// UPDATE the currently authenticated store's profile (email is immutable here)
+app.put('/api/auth/me', requireAuth, async (req, res) => {
+  try {
+    const { name, phone, address } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Store name is required' });
+    }
+
+    const store = await prisma.store.update({
+      where: { id: req.storeId },
+      data: { name, phone: phone || null, address: address || null },
+    });
+    res.json({ store: omitPassword(store) });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Store name is already taken' });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // ============= STORE ROUTES =============
 
 // GET all stores
