@@ -63,7 +63,7 @@ export default function RegisterPage() {
             });
 
             login(token, store);
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             setError(err.message);
         } finally {
