@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {supabase} from "../lib/supabaseClient";
+import { api } from '../lib/apiClient';
+import { useAuth } from '../context/authContext';
 
 
 export default function RegisterPage() {
     const router = useRouter();
+    const { login } = useAuth();
 
     // Form field state
     const [formData, setFormData] = useState({
@@ -28,7 +30,7 @@ export default function RegisterPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Basic client-side validation before we ever call Supabase
+    // Basic client-side validation before we ever call the API
     const validate = () => {
         if (!formData.storeName.trim()) return 'Store name is required.';
         if (!formData.email.trim()) return 'Email is required.';
@@ -49,45 +51,24 @@ export default function RegisterPage() {
 
         setLoading(true);
 
-        // Step 1: Create the login identity in Supabase Auth
-        const { data, error: signUpError } = await supabase.auth.signUp({
-            email: formData.email,
-            password: formData.password,
-        });
-
-        if (signUpError) {
-            setError(signUpError.message);
-            setLoading(false);
-            return;
-        }
-
-        // Step 2: Create the store's public profile row, linked by the
-        // new user's id. This is separate from auth.users because that
-        // table is private/managed by Supabase — we keep our own business
-        // data (store name, phone, address) in `stores`.
-        const newUser = data.user;
-        if (newUser) {
-            const { error: profileError } = await supabase.from('stores').insert({
-                id: newUser.id,
-                store_name: formData.storeName,
+        try {
+            // Registering creates the store account and its Store row in one
+            // request — the Express API hashes the password server-side.
+            const { token, store } = await api.register({
+                storeName: formData.storeName,
                 email: formData.email,
+                password: formData.password,
                 phone: formData.phone || null,
                 address: formData.address || null,
             });
 
-            if (profileError) {
-                setError(profileError.message);
-                setLoading(false);
-                return;
-            }
+            login(token, store);
+            router.push('/');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
-
-        // Supabase sends a confirmation email by default. Send the store
-        // to the login page — we'll wire up the success message there once
-        // that page exists.
-        router.push('/login');
     };
 
     return (
