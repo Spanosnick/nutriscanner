@@ -37,11 +37,17 @@ export function AuthProvider({ children }) {
         setStore(null);
     };
 
+    // Call after a successful profile update to refresh the cached store data.
+    const updateStore = (storeData) => {
+        setStore(storeData);
+    };
+
     const value = {
         store,
         loading,
         login,
         logout,
+        updateStore,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
