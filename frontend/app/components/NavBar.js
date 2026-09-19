@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/authContext';
 
 const links = [
@@ -16,15 +17,6 @@ function Dot({ active }) {
         <span
             aria-hidden="true"
             className={`h-2 w-2 shrink-0 rounded-sm ${active ? 'bg-accent' : 'bg-rule-strong'}`}
-        />
-    );
-}
-
-function LogoutIcon() {
-    return (
-        <span
-            aria-hidden="true"
-            className="h-[13px] w-[13px] rounded-[3px] border-[1.5px] border-current border-r-transparent"
         />
     );
 }
@@ -126,7 +118,7 @@ export default function NavBar() {
                         condensed ? 'h-8' : 'h-[38px]'
                     }`}
                 >
-                    <LogoutIcon />
+                    <LogOut className="h-4 w-4" strokeWidth={1.5} />
                     Log out
                 </button>
 
@@ -138,13 +130,9 @@ export default function NavBar() {
                     className="ml-auto flex h-11 w-11 flex-none items-center justify-center rounded-[10px] text-ink hover:bg-surface-hover md:hidden"
                 >
                     {open ? (
-                        <span className="text-lg leading-none">&times;</span>
+                        <X className="h-4 w-4" strokeWidth={1.5} />
                     ) : (
-                        <span className="flex flex-col items-center gap-1">
-                            <span className="h-[1.8px] w-[17px] bg-ink" />
-                            <span className="h-[1.8px] w-[17px] bg-ink" />
-                            <span className="h-[1.8px] w-[17px] bg-ink" />
-                        </span>
+                        <Menu className="h-4 w-4" strokeWidth={1.5} />
                     )}
                 </button>
             </nav>
@@ -175,7 +163,7 @@ export default function NavBar() {
                         onClick={handleLogout}
                         className="flex h-12 w-full items-center gap-[11px] rounded-[10px] px-[14px] text-[15px] font-medium text-ink-muted hover:bg-surface-hover hover:text-ink"
                     >
-                        <LogoutIcon />
+                        <LogOut className="h-4 w-4" strokeWidth={1.5} />
                         Log out
                     </button>
                 </div>
