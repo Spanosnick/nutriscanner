@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #F7F8F8; }
+  a { color: #0E7490; }
+  a:hover { color: #0B5A6E; }
+  * { box-sizing: border-box; }
+</style>
+</helmet>
+
+<div style="font-family: Archivo, Helvetica, Arial, sans-serif; color: #101418; background: #F7F8F8; min-height: 100vh; padding-bottom: 96px;">
+
+  <header style="background: #FFFFFF; border-bottom: 1px solid #E3E7E8; position: sticky; top: 0; z-index: 20;">
+    <nav style="max-width: 1360px; margin: 0 auto; padding: 0 24px; height: 68px; display: flex; align-items: center; gap: 24px;">
+
+      <a href="#" style="display: flex; align-items: center; gap: 11px; text-decoration: none; color: #101418; flex: none;">
+        <span style="width: 34px; height: 34px; border-radius: 9px; border: 1px dashed #B9C2C4; background: repeating-linear-gradient(135deg, #F1F4F4 0 5px, #FFFFFF 5px 10px); display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 8px; color: #8A9597;">logo</span>
+        <span style="display: flex; flex-direction: column; line-height: 1;">
+          <span style="font-size: 17px; font-weight: 700; letter-spacing: -0.025em;">NutriScanner</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin-top: 5px;">Store console</span>
+        </span>
+      </a>
+
+      <span style="width: 1px; height: 26px; background: #E3E7E8; flex: none;"></span>
+
+      <div style="display: flex; align-items: center; gap: 4px; flex: 1 1 auto; min-width: 0;">
+        <sc-for list="{{ links }}" as="link" hint-placeholder-count="3">
+          <sc-if value="{{ link.active }}" hint-placeholder-val="{{ false }}">
+            <a href="#" onClick="{{ link.onClick }}" style="display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; color: #0E7490; background: #E4F1F4; white-space: nowrap;" style-focus="outline: 2px solid #0E7490; outline-offset: 2px;">
+              <sc-if value="{{ showIcons }}" hint-placeholder-val="{{ true }}">
+                <span style="width: 8px; height: 8px; flex: none; border-radius: 2px; background: #0E7490;"></span>
+              </sc-if>
+              {{ link.label }}
+            </a>
+          </sc-if>
+          <sc-if value="{{ link.inactive }}" hint-placeholder-val="{{ true }}">
+            <a href="#" onClick="{{ link.onClick }}" style="display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500; color: #4A5457; background: transparent; white-space: nowrap;" style-hover="background: #F1F4F4; color: #101418;" style-focus="outline: 2px solid #0E7490; outline-offset: 2px;">
+              <sc-if value="{{ showIcons }}" hint-placeholder-val="{{ true }}">
+                <span style="width: 8px; height: 8px; flex: none; border-radius: 2px; background: #C9D0D1;"></span>
+              </sc-if>
+              {{ link.label }}
+            </a>
+          </sc-if>
+        </sc-for>
+      </div>
+
+      <button onClick="{{ onLogout }}" style="display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 15px; border: 1px solid #E3E7E8; border-radius: 10px; background: #FFFFFF; font-family: Archivo, sans-serif; font-size: 14px; font-weight: 500; color: #4A5457; cursor: pointer; flex: none;" style-hover="border-color: #C9D0D1; color: #101418; background: #FBFCFC;" style-focus="outline: 2px solid #0E7490; outline-offset: 2px;">
+        <span style="width: 13px; height: 13px; border: 1.5px solid currentColor; border-radius: 3px; border-right-color: transparent;"></span>
+        Log out
+      </button>
+
+    </nav>
+  </header>
+
+  <main style="max-width: 1360px; margin: 0 auto; padding: 52px 24px 0;">
+
+    <p style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #8A9597; margin: 0 0 12px;">Nav / v1</p>
+    <h1 style="font-size: 40px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 14px;">Primary navigation</h1>
+    <p style="font-size: 16px; line-height: 1.55; color: #4A5457; max-width: 56ch; margin: 0 0 60px; text-wrap: pretty;">The bar above is live — click a link and the active pill moves. Below: the condensed and mobile variants, plus the tokens the bar is built from.</p>
+
+    <h2 style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid #E3E7E8;">Scrolled / condensed</h2>
+    <p style="font-size: 14.5px; line-height: 1.55; color: #4A5457; max-width: 52ch; margin: 0 0 18px;">Past 40px of scroll the bar drops to 52px, the store label hides, and a soft shadow replaces the border.</p>
+    <div style="background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 14px; overflow: hidden; margin-bottom: 60px; box-shadow: 0 1px 2px rgba(16,20,24,0.05);">
+      <div style="padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 20px; box-shadow: 0 1px 12px rgba(16,20,24,0.08);">
+        <span style="display: flex; align-items: center; gap: 9px; flex: none;">
+          <span style="width: 26px; height: 26px; border-radius: 7px; border: 1px dashed #B9C2C4; background: repeating-linear-gradient(135deg, #F1F4F4 0 5px, #FFFFFF 5px 10px);"></span>
+          <span style="font-size: 15px; font-weight: 700; letter-spacing: -0.025em;">NutriScanner</span>
+        </span>
+        <span style="display: flex; align-items: center; gap: 4px; flex: 1 1 auto;">
+          <span style="display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #4A5457;">Dashboard</span>
+          <span style="display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: #0E7490; background: #E4F1F4;">Products</span>
+          <span style="display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #4A5457;">Profile</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 13px; border: 1px solid #E3E7E8; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #4A5457; flex: none;">
+          <span style="width: 12px; height: 12px; border: 1.5px solid currentColor; border-radius: 3px; border-right-color: transparent;"></span>Log out
+        </span>
+      </div>
+    </div>
+
+    <h2 style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid #E3E7E8;">Mobile — collapsed menu</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 60px;">
+
+      <div style="width: 320px; max-width: 100%; background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 18px; overflow: hidden;">
+        <div style="height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E3E7E8;">
+          <span style="display: flex; align-items: center; gap: 9px;">
+            <span style="width: 30px; height: 30px; border-radius: 8px; border: 1px dashed #B9C2C4; background: repeating-linear-gradient(135deg, #F1F4F4 0 5px, #FFFFFF 5px 10px);"></span>
+            <span style="font-size: 15.5px; font-weight: 700; letter-spacing: -0.025em;">NutriScanner</span>
+          </span>
+          <span style="width: 44px; height: 44px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;">
+            <span style="width: 17px; height: 1.8px; background: #101418;"></span>
+            <span style="width: 17px; height: 1.8px; background: #101418;"></span>
+            <span style="width: 17px; height: 1.8px; background: #101418;"></span>
+          </span>
+        </div>
+        <div style="padding: 44px 16px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597;">closed</div>
+      </div>
+
+      <div style="width: 320px; max-width: 100%; background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 18px; overflow: hidden;">
+        <div style="height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E3E7E8;">
+          <span style="display: flex; align-items: center; gap: 9px;">
+            <span style="width: 30px; height: 30px; border-radius: 8px; border: 1px dashed #B9C2C4; background: repeating-linear-gradient(135deg, #F1F4F4 0 5px, #FFFFFF 5px 10px);"></span>
+            <span style="font-size: 15.5px; font-weight: 700; letter-spacing: -0.025em;">NutriScanner</span>
+          </span>
+          <span style="width: 44px; height: 44px; border-radius: 10px; background: #F1F4F4; display: grid; place-items: center; font-size: 18px; color: #101418; line-height: 1;">×</span>
+        </div>
+        <div style="display: flex; flex-direction: column; padding: 10px;">
+          <span style="display: flex; align-items: center; gap: 11px; height: 48px; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 500; color: #4A5457;">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: #C9D0D1;"></span>Dashboard
+          </span>
+          <span style="display: flex; align-items: center; gap: 11px; height: 48px; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 600; color: #0E7490; background: #E4F1F4;">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: #0E7490;"></span>Products
+          </span>
+          <span style="display: flex; align-items: center; gap: 11px; height: 48px; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 500; color: #4A5457;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #C9D0D1;"></span>Profile
+          </span>
+          <span style="height: 1px; background: #E3E7E8; margin: 10px 14px;"></span>
+          <span style="display: flex; align-items: center; gap: 11px; height: 48px; padding: 0 14px; border-radius: 10px; font-size: 15px; font-weight: 500; color: #4A5457;">
+            <span style="width: 13px; height: 13px; border: 1.5px solid currentColor; border-radius: 3px; border-right-color: transparent;"></span>Log out
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <h2 style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid #E3E7E8;">Tokens</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;">
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 14px; padding: 18px;">
+        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 14px;">Color</p>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #4A5457;">
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #0E7490;"></span>accent #0E7490</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #E4F1F4;"></span>accent-wash #E4F1F4</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #101418;"></span>ink #101418</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #4A5457;"></span>ink-muted #4A5457</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #E3E7E8;"></span>rule #E3E7E8</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span style="width: 20px; height: 20px; border-radius: 5px; background: #F7F8F8; border: 1px solid #E3E7E8;"></span>canvas #F7F8F8</span>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 14px; padding: 18px;">
+        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 14px;">Type</p>
+        <p style="margin: 0 0 8px; font-size: 22px; font-weight: 700; letter-spacing: -0.03em;">Archivo 700</p>
+        <p style="margin: 0 0 8px; font-size: 14px; font-weight: 500; color: #4A5457;">Archivo 500 — nav links, 14px</p>
+        <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597;">IBM Plex Mono — labels</p>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E7E8; border-radius: 14px; padding: 18px;">
+        <p style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A9597; margin: 0 0 14px;">Metrics</p>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #4A5457;">
+          <span>bar height — 68px / 52px condensed</span>
+          <span>link pill — 38px, radius 10px</span>
+          <span>gap between links — 4px</span>
+          <span>mobile row — 48px, target 44px+</span>
+          <span>page gutter — 24px</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showIcons&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Nav&quot;}}">
+class Component extends DCLogic {
+  state = { active: 'Products' };
+
+  renderVals() {
+    const items = ['Dashboard', 'Products', 'Profile'];
+    const links = items.map(label => ({
+      label,
+      active: this.state.active === label,
+      inactive: this.state.active !== label,
+      onClick: (e) => { e.preventDefault(); this.setState({ active: label }); }
+    }));
+    return {
+      links,
+      showIcons: this.props.showIcons ?? true,
+      onLogout: (e) => e.preventDefault()
+    };
+  }
+}
+</script>
+</body>
+</html>
