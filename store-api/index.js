@@ -199,19 +199,87 @@ app.delete('/api/stores/:id', requireAuth, async (req, res) => {
   }
 });
 
-// ============= PRODUCT ROUTES =============
+// ============= CATEGORY ROUTES =============
 
-// GET all products (with filters)
-app.get('/api/products', async (req, res) => {
+// GET all categories
+app.get('/api/categories', requireAuth, async (req, res) => {
   try {
-    const { storeId, category } = req.query;
-    const where = {};
-    if (storeId) where.storeId = parseInt(storeId);
-    if (category) where.category = category;
-    
+    const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// CREATE category
+app.post('/api/categories', requireAuth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Category name is required' });
+    }
+    const category = await prisma.category.create({ data: { name } });
+    res.status(201).json(category);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Category already exists' });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// UPDATE category
+app.put('/api/categories/:id', requireAuth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Category name is required' });
+    }
+    const category = await prisma.category.update({
+      where: { id: parseInt(req.params.id) },
+      data: { name },
+    });
+    res.json(category);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'Category already exists' });
+    }
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE category
+app.delete('/api/categories/:id', requireAuth, async (req, res) => {
+  try {
+    await prisma.category.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ message: 'Category deleted' });
+  } catch (error) {
+    if (error.code === 'P2003') {
+      return res.status(409).json({ error: 'Category is still assigned to products' });
+    }
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ============= PRODUCT ROUTES =============
+// All scoped to the authenticated store (req.storeId) — never trust an id from the URL/body for ownership.
+
+// GET all products for the authenticated store (optionally filtered by category)
+app.get('/api/products', requireAuth, async (req, res) => {
+  try {
+    const { categoryId } = req.query;
+    const where = { storeId: req.storeId };
+    if (categoryId) where.categoryId = parseInt(categoryId);
+
     const products = await prisma.product.findMany({
       where,
-      include: { store: true }
+      include: { category: true }
     });
     res.json(products);
   } catch (error) {
@@ -219,68 +287,87 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// GET single product by ID
-app.get('/api/products/:id', async (req, res) => {
+// GET single product by ID (must belong to the authenticated store)
+app.get('/api/products/:id', requireAuth, async (req, res) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id: parseInt(req.params.id) },
-      include: { store: true }
+      include: { category: true }
     });
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    if (!product || product.storeId !== req.storeId) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// CREATE product
-app.post('/api/products', async (req, res) => {
+// CREATE product for the authenticated store
+app.post('/api/products', requireAuth, async (req, res) => {
   try {
-    const { name, category, calories, price, description, storeId } = req.body;
+    const { name, categoryId, calories, price, description } = req.body;
+    if (!categoryId) {
+      return res.status(400).json({ error: 'categoryId is required' });
+    }
     const product = await prisma.product.create({
       data: {
         name,
-        category,
+        categoryId: parseInt(categoryId),
         calories: calories ? parseInt(calories) : null,
         price: parseFloat(price),
         description,
-        storeId: parseInt(storeId)
+        storeId: req.storeId
       },
-      include: { store: true }
+      include: { category: true }
     });
     res.status(201).json(product);
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'A product with this name already exists' });
+    }
     res.status(400).json({ error: error.message });
   }
 });
 
-// UPDATE product
-app.put('/api/products/:id', async (req, res) => {
+// UPDATE product (must belong to the authenticated store)
+app.put('/api/products/:id', requireAuth, async (req, res) => {
   try {
-    const { name, category, calories, price, description } = req.body;
+    const existing = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!existing || existing.storeId !== req.storeId) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const { name, categoryId, calories, price, description } = req.body;
     const product = await prisma.product.update({
       where: { id: parseInt(req.params.id) },
       data: {
         name,
-        category,
+        categoryId: categoryId ? parseInt(categoryId) : undefined,
         calories: calories ? parseInt(calories) : null,
         price: parseFloat(price),
         description
       },
-      include: { store: true }
+      include: { category: true }
     });
     res.json(product);
   } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'A product with this name already exists' });
+    }
     res.status(400).json({ error: error.message });
   }
 });
 
-// DELETE product
-app.delete('/api/products/:id', async (req, res) => {
+// DELETE product (must belong to the authenticated store)
+app.delete('/api/products/:id', requireAuth, async (req, res) => {
   try {
-    await prisma.product.delete({
-      where: { id: parseInt(req.params.id) }
-    });
+    const existing = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
+    if (!existing || existing.storeId !== req.storeId) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    await prisma.product.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ message: 'Product deleted' });
   } catch (error) {
     res.status(400).json({ error: error.message });

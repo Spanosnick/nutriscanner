@@ -1,13 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Plus } from 'lucide-react';
+import { api } from '../../lib/apiClient';
 
-const EMPTY = { name: '', category: '', price: '', calories: '', description: '' };
+const EMPTY = { name: '', categoryId: '', price: '', calories: '', description: '' };
 
 export default function AddProductModal({ open, onClose }) {
     const [formData, setFormData] = useState(EMPTY);
     const [error, setError] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [categoriesError, setCategoriesError] = useState('');
+
+    useEffect(() => {
+        if (!open) return;
+        api.getCategories()
+            .then(setCategories)
+            .catch((err) => setCategoriesError(err.message));
+    }, [open]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -16,7 +26,7 @@ export default function AddProductModal({ open, onClose }) {
 
     const validate = () => {
         if (!formData.name.trim()) return 'Product name is required.';
-        if (!formData.category.trim()) return 'Category is required.';
+        if (!formData.categoryId) return 'Category is required.';
         if (!formData.price || Number(formData.price) <= 0) return 'Enter a valid price.';
         return '';
     };
@@ -24,6 +34,7 @@ export default function AddProductModal({ open, onClose }) {
     const clearFields = () => {
         setFormData(EMPTY);
         setError('');
+        setCategoriesError('');
     };
 
     const handleClose = () => {
@@ -92,17 +103,23 @@ export default function AddProductModal({ open, onClose }) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="category" className="font-mono text-[11px] tracking-[0.1em] text-ink-soft uppercase">
+                        <label htmlFor="categoryId" className="font-mono text-[11px] tracking-[0.1em] text-ink-soft uppercase">
                             Category
                         </label>
-                        <input
-                            id="category"
-                            name="category"
-                            value={formData.category}
+                        <select
+                            id="categoryId"
+                            name="categoryId"
+                            value={formData.categoryId}
                             onChange={handleChange}
-                            placeholder="Sandwiches"
                             className="h-10 w-full rounded-[10px] border border-rule bg-surface px-3 text-sm text-ink outline-none focus:border-accent focus:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                        />
+                        >
+                            <option value="" disabled>
+                                {categoriesError ? 'Couldn’t load categories' : 'Select a category'}
+                            </option>
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="flex flex-col gap-2">
