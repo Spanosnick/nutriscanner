@@ -24,4 +24,5 @@ export const api = {
     login: (payload) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
     me: () => request('/api/auth/me'),
     updateMe: (payload) => request('/api/auth/me', { method: 'PUT', body: JSON.stringify(payload) }),
+    getCategories: () => request('/api/categories'),
 };

@@ -26,19 +26,31 @@ model Store {
   products  Product[]
 }
 
+model Category {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products  Product[]
+}
+
 model Product {
   id        Int     @id @default(autoincrement())
   name      String
-  category  String
   calories  Int?
   price     Float
   description String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Foreign key: product belongs to store
   storeId   Int
   store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  
+
+  // Foreign key: product belongs to a category
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
   @@unique([name, storeId]) // name must be unique per store
 }
