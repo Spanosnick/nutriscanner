@@ -21,18 +21,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-      <html
-          lang="en"
-          className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}
-      >
+    <html
+      lang="en"
+      className={`${archivo.variable} ${plexMono.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
-      <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
-      </html>
+    </html>
   );
 }

@@ -19,16 +19,16 @@ export default function AppLayout({ children }) {
 
     if (loading || !store) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <p className="text-gray-400 text-sm">Loading...</p>
+            <div className="min-h-screen flex items-center justify-center bg-canvas">
+                <p className="text-ink-soft text-sm">Loading...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-canvas">
             <NavBar />
-            <main className="max-w-5xl mx-auto px-4 py-8">{children}</main>
+            <main className="max-w-[1360px] mx-auto px-6 py-8">{children}</main>
         </div>
     );
 }
