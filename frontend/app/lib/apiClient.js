@@ -25,4 +25,6 @@ export const api = {
     me: () => request('/api/auth/me'),
     updateMe: (payload) => request('/api/auth/me', { method: 'PUT', body: JSON.stringify(payload) }),
     getCategories: () => request('/api/categories'),
+    getProducts: () => request('/api/products'),
+    createProduct: (payload) => request('/api/products', { method: 'POST', body: JSON.stringify(payload) }),
 };

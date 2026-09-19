@@ -307,16 +307,23 @@ app.get('/api/products/:id', requireAuth, async (req, res) => {
 app.post('/api/products', requireAuth, async (req, res) => {
   try {
     const { name, categoryId, calories, price, description } = req.body;
-    if (!categoryId) {
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Product name is required' });
+    }
+    if (!categoryId || Number.isNaN(parseInt(categoryId))) {
       return res.status(400).json({ error: 'categoryId is required' });
     }
+    if (price === undefined || price === null || Number.isNaN(parseFloat(price))) {
+      return res.status(400).json({ error: 'A valid price is required' });
+    }
+
     const product = await prisma.product.create({
       data: {
-        name,
+        name: name.trim(),
         categoryId: parseInt(categoryId),
         calories: calories ? parseInt(calories) : null,
         price: parseFloat(price),
-        description,
+        description: description ? description.trim() : null,
         storeId: req.storeId
       },
       include: { category: true }
@@ -325,6 +332,9 @@ app.post('/api/products', requireAuth, async (req, res) => {
   } catch (error) {
     if (error.code === 'P2002') {
       return res.status(409).json({ error: 'A product with this name already exists' });
+    }
+    if (error.code === 'P2003') {
+      return res.status(400).json({ error: 'Selected category does not exist' });
     }
     res.status(400).json({ error: error.message });
   }

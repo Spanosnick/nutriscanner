@@ -6,9 +6,10 @@ import { api } from '../../lib/apiClient';
 
 const EMPTY = { name: '', categoryId: '', price: '', calories: '', description: '' };
 
-export default function AddProductModal({ open, onClose }) {
+export default function AddProductModal({ open, onClose, onCreated }) {
     const [formData, setFormData] = useState(EMPTY);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
     const [categoriesError, setCategoriesError] = useState('');
 
@@ -42,15 +43,31 @@ export default function AddProductModal({ open, onClose }) {
         onClose();
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const validationError = validate();
         if (validationError) {
             setError(validationError);
             return;
         }
 
-        clearFields();
-        onClose();
+        setLoading(true);
+        setError('');
+        try {
+            const product = await api.createProduct({
+                name: formData.name.trim(),
+                categoryId: formData.categoryId,
+                price: formData.price,
+                calories: formData.calories || undefined,
+                description: formData.description.trim() || undefined,
+            });
+            clearFields();
+            onCreated?.(product);
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!open) return null;
@@ -174,17 +191,19 @@ export default function AddProductModal({ open, onClose }) {
                     <button
                         type="button"
                         onClick={clearFields}
-                        className="h-10 rounded-[10px] border border-rule bg-white px-4 text-sm font-medium text-ink-muted transition-colors hover:border-rule-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        disabled={loading}
+                        className="h-10 rounded-[10px] border border-rule bg-white px-4 text-sm font-medium text-ink-muted transition-colors hover:border-rule-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         Clear fields
                     </button>
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        className="flex h-10 items-center gap-2 rounded-[10px] bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-[#0B5A6E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                        disabled={loading}
+                        className="flex h-10 items-center gap-2 rounded-[10px] bg-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-[#0B5A6E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         <Plus className="h-4 w-4" strokeWidth={2} />
-                        Add product
+                        {loading ? 'Adding…' : 'Add product'}
                     </button>
                 </div>
             </div>
