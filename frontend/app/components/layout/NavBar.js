@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LogOut, Menu, X } from 'lucide-react';
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../../context/authContext';
 
 const links = [
     { href: '/dashboard', label: 'Dashboard' },
@@ -45,10 +45,13 @@ export default function NavBar() {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Close the mobile menu on navigation (adjusting state during render
+    // instead of in an effect avoids an extra render pass).
+    const [lastPathname, setLastPathname] = useState(pathname);
+    if (pathname !== lastPathname) {
+        setLastPathname(pathname);
         setOpen(false);
-    }, [pathname]);
+    }
 
     const handleLogout = () => {
         logout();
