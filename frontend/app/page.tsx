@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import LoadingScreen from './components/ui/LoadingScreen';
 import { useAuth } from './context/authContext';
 
 export default function Home() {
@@ -13,9 +14,5 @@ export default function Home() {
     router.replace(store ? '/dashboard' : '/login');
   }, [store, loading, router]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <p className="text-gray-400 text-sm">Loading...</p>
-    </div>
-  );
+  return <LoadingScreen />;
 }

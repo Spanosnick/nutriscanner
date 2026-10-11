@@ -8,6 +8,26 @@ NutriScanner's frontend has grown past the `create-next-app` scaffold: it now ha
 
 This directory (`frontend/`) is the Next.js client only. The API it talks to lives in a sibling directory, `../store-api` (Express 5 + Prisma 5 + JWT + bcryptjs) — not part of this repo checkout's frontend tree. There is no `app/api/` route handler in this project; every request goes out over `fetch` to that external service.
 
+## Code structure
+
+Pages under `app/` are thin: they compose a feature component and nothing else. Logic lives beside the feature.
+
+```
+app/
+  (app)/ login/ register/        # routes only — render a feature component
+  components/ui/                 # generic primitives: Alert, Button, FormField, PasswordField, Modal, PageHeader, AuthCard, LoadingScreen
+  components/layout/NavBar.js
+  context/authContext.js         # useAuth() throws outside <AuthProvider>
+  hooks/useForm.js               # values + handleChange + validate + loading/error around an async onSubmit
+  lib/apiClient.js               # only place that calls fetch
+  features/<name>/
+    components/                  # presentational + view components
+    hooks/                       # useXForm / useXs: compose useForm + api calls
+    validation.js                # pure validate*/build*Payload functions
+```
+
+New form = a `validation.js` function + a `use<X>Form` hook (wrapping `useForm`) + a component using `FormField`/`Button`/`Alert`. Import across folders with the `@/app/...` alias.
+
 ## Commands
 
 ```bash

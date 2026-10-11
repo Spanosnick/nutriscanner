@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/authContext';
-import NavBar from '../components/NavBar';
+import NavBar from '../components/layout/NavBar';
+import LoadingScreen from '../components/ui/LoadingScreen';
 
 // Wraps every authenticated route (dashboard, products, profile, ...).
 // Bounces to /login if there's no logged-in store.
@@ -17,13 +18,7 @@ export default function AppLayout({ children }) {
         }
     }, [loading, store, router]);
 
-    if (loading || !store) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-canvas">
-                <p className="text-ink-soft text-sm">Loading...</p>
-            </div>
-        );
-    }
+    if (loading || !store) return <LoadingScreen />;
 
     return (
         <div className="min-h-screen bg-canvas">
